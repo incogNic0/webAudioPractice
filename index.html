@@ -9,8 +9,16 @@
 </head>
 <body>
     <h1>Web Audio API Practice</h1>
-    <button id="play-btn">Start</button>
-    <div class="samples-container">
+    <div class="controls">
+        <button id="play-btn" class="btn">Start</button>
+        <div class="controls-tempo">
+            <label for="tempo">BPM</label>
+            <input id="tempo" type="range" min="60" max="200" value="90">
+            <span id="current-tempo">90</span>
+        </div>
+        <button id="reset-btn" class="btn">Rest</button>
+    </div>
+    <div class="container">
         <div class="sample-row">
             <div class="sample-name">
                 Hi-Hat02
@@ -61,7 +69,6 @@
         </div>
     </div>
 
-    <script src="kits.js"></script>
     <script src="scripts.js"></script>
 </body>
 </html>

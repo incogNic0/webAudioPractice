@@ -11,18 +11,20 @@ body {
     text-align: center;
 }
 
-#play-btn {
+.btn {
     margin: 20px;
     font-size: 24px;
     padding: 10px 20px;
 }
 
-.samples-container {
+.controls-tempo {
+    display: inline-block;
+}
+
+.container {
     margin: 20px auto;
-    /* display: flex; */
+    padding: 20px 0;
     width: 60%;
-    /* justify-content: space-evenly; */
-    /* align-items: center; */
     background-color: coral;
 }
 
@@ -56,4 +58,23 @@ body {
 
 .playing {
     background-color: yellowgreen;
+}
+
+.playing-all {
+    border-color: bisque;
+}
+
+
+@media screen and (max-width: 950px) {
+    .container {
+        width: 90%;
+    }
+}
+@media screen and (max-width: 660px) {
+    body {
+        padding: 0;
+    }
+    .container {
+        width: 100%;
+    }
 }
