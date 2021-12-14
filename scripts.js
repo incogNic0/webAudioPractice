@@ -12,7 +12,8 @@ let kitState = [
     [false, false, false, false],
     [false, false, false, false]
 ]
-
+let animationType = animateAll;
+let runAnimation;
 const audioBuffers = [];
 setupSamples(); // add buffer for each sample to audioBuffers
 
@@ -36,6 +37,10 @@ pads.forEach( pad => {
 const resetBtn = document.querySelector('#reset-btn');
 resetBtn.addEventListener('click', handleReset);
 
+// ANIMATION SELECTOR
+const animationInput = document.querySelector('#animation-input');
+animationInput.addEventListener('change', handleAnimationOption );
+
 
 // ========== EVENT HANDLERS ============
 // START / STOP
@@ -48,12 +53,13 @@ async function handlePlayEvent() {
         currentStep = 0;
         nextStepTime = audioContext.currentTime;
         scheduler(); // handles scheduling and playback
-        requestAnimationFrame(draw);
+        runAnimation = requestAnimationFrame(animationType);
     } else {
         playBtn.textContent = 'Start'
         clearTimeout(timerID);
         audioContext.currentTime = 0;
         clearAnimation();
+        cancelAnimationFrame(runAnimation);
     }
 }
 
@@ -89,6 +95,15 @@ function handleReset() {
     tempo = 90;
     tempoInput.value = tempo;
     tempoDisplay.textContent = tempo;
+}
+
+// ANIMATION
+function handleAnimationOption(evt) {
+    cancelAnimationFrame(runAnimation);
+    clearAnimation();
+    const checked = evt.target.checked;
+    animationType = checked ? animateActive : animateAll;
+    runAnimation = requestAnimationFrame(animationType)
 }
 
 
@@ -150,10 +165,10 @@ function scheduleSamples(step, startTime) {
 }
 
 // ========== ANIMATIONS =============
+let lastStepDrawn = 3;
 
 // ANIMATE ALL PADS BOTH ACTIVE AND INACTIVE
-let lastStepDrawn = 3;
-function draw() {
+function animateAll() {
     let drawStep = lastStepDrawn;
     const currentTime = audioContext.currentTime;
 
@@ -162,7 +177,7 @@ function draw() {
         stepsQueue.shift();   // remove note from queue
     }
 
-    // We only need to draw if the note has moved.
+    // Only draw if the step moved.
     if (lastStepDrawn !== drawStep) {
         pads.forEach(el => {
         el.children[lastStepDrawn].classList.remove('playing-all');
@@ -172,33 +187,32 @@ function draw() {
         lastStepDrawn = drawStep;
     }
     // set up to draw again
-    requestAnimationFrame(draw);
+    runAnimation = requestAnimationFrame(animateAll);
 }
 
 // ANIMATE ONLY ACTIVE PADS
-// let lastStepDrawn = 3;
-// function draw() {
-//     let drawStep = lastStepDrawn;
-//     const currentTime = audioContext.currentTime;
+function animateActive() {
+    let drawStep = lastStepDrawn;
+    const currentTime = audioContext.currentTime;
 
-//     while (stepsQueue.length && stepsQueue[0].startTime < currentTime) {
-//         drawStep = stepsQueue[0].step;
-//         stepsQueue.shift();   // remove note from queue
-//     }
+    while (stepsQueue.length && stepsQueue[0].startTime < currentTime) {
+        drawStep = stepsQueue[0].step;
+        stepsQueue.shift();   // remove note from queue
+    }
 
-//     // We only need to draw if the note has moved.
-//     if (lastStepDrawn !== drawStep) {
-//         pads.forEach((row, index) => {
-//             const isActive = kitState[index][drawStep];
-//             row.children[lastStepDrawn].classList.remove('playing');
-//             if (isActive) row.children[drawStep].classList.add('playing');
-//         });
+    // Only draw if the step moved.
+    if (lastStepDrawn !== drawStep) {
+        pads.forEach((row, index) => {
+            const isActive = kitState[index][drawStep];
+            row.children[lastStepDrawn].classList.remove('playing');
+            if (isActive) row.children[drawStep].classList.add('playing');
+        });
 
-//         lastStepDrawn = drawStep;
-//     }
-//     // set up to draw again
-//     requestAnimationFrame(draw);
-// }
+        lastStepDrawn = drawStep;
+    }
+    // set up to draw again
+    runAnimation = requestAnimationFrame(animateActive);
+}
 
 function clearAnimation() {
     const lastPlayedPads = Array.from(document.querySelectorAll('.playing'));
