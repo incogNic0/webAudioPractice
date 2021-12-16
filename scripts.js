@@ -27,6 +27,12 @@ const tempoInput = document.querySelector('#tempo');
 const tempoDisplay = document.querySelector('#current-tempo');
 tempoInput.addEventListener('input', handleTempoChange );
 
+// ADJUST GAIN
+const gainInputs = document.querySelectorAll('.gain-input');
+gainInputs.forEach( gain => {
+    gain.addEventListener('input', handleGainEvent );
+});
+
 // SELECT PADS
 const pads = Array.from(document.querySelectorAll('.pads'));
 pads.forEach( pad => {
@@ -63,17 +69,6 @@ async function handlePlayEvent() {
     }
 }
 
-// SELECT PAD
-function handlePadClick(evt) {
-    const row = Number(evt.target.parentElement.id);
-    const elem = evt.target;
-    if (elem.classList.contains('pad')) {
-        elem.classList.toggle('selected');
-    }
-    const padsArrray = Array.from(pads[row].children);
-    kitState[row] = padsArrray.map( pad => pad.classList.contains('selected'));
-}
-
 // CHANGE TEMPO
 function handleTempoChange(evt) {
     const newTempo = evt.target.value;
@@ -95,7 +90,29 @@ function handleReset() {
     tempo = 90;
     tempoInput.value = tempo;
     tempoDisplay.textContent = tempo;
+    gainInputs.forEach(input => {
+        const gainDisplay = input.parentElement.children[0].children[0]
+        gainDisplay.textContent = 1;
+        input.value = 1;
+    });
 }
+
+function handleGainEvent(evt) {
+    const gainDisplay = evt.target.parentElement.children[0].children[0]
+    gainDisplay.textContent = evt.target.value;
+}
+
+// SELECT PAD
+function handlePadClick(evt) {
+    const row = Number(evt.target.parentElement.id);
+    const elem = evt.target;
+    if (elem.classList.contains('pad')) {
+        elem.classList.toggle('selected');
+    }
+    const padsArrray = Array.from(pads[row].children);
+    kitState[row] = padsArrray.map( pad => pad.classList.contains('selected'));
+}
+
 
 // ANIMATION
 function handleAnimationOption(evt) {
@@ -126,10 +143,12 @@ async function setupSamples() {
     }
 }
 
-function playback(audio, startTime) {
+function playback(data, startTime) {
     const playSound = audioContext.createBufferSource();
-    playSound.buffer = audio;
-    playSound.connect(audioContext.destination);
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = data.gainValue;
+    playSound.buffer = data.audio;
+    playSound.connect(gainNode).connect(audioContext.destination);
     playSound.start(startTime); // will play when audioContext.currentTime === startTime
 }
 
@@ -159,7 +178,11 @@ function scheduleSamples(step, startTime) {
     for (let i=0; i<len; i++) {
         const isActive = kitState[i][step];
         if(isActive) {
-            playback(audioBuffers[i], startTime);
+            const params = {
+                audio: audioBuffers[i],
+                gainValue: gainInputs[i].value
+            }
+            playback(params, startTime);
         }
     }
 }
