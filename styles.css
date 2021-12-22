@@ -131,6 +131,37 @@ border-radius: 34px;
 border-radius: 50%;
 }
 
+.filters {
+  margin-top: 10px;
+}
+
+.filter-inputs {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.filter-inputs label {
+  display: block
+}
+
+.filter-inputs div {
+  margin-left: 20px;
+}
+
+.filter-btn {
+  border: 1px solid gray;
+  background-color: lightgray;
+  color: gray;
+  padding: 2px;
+  border-radius: none;
+}
+
+.active {
+  border-color: black;
+  background-color: white;
+  color: black;
+}
 
 @media screen and (max-width: 950px) {
     .container {

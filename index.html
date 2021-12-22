@@ -25,6 +25,26 @@
             </label>
             <span class="animation-option">Animation 2</span>
         </div>
+        <div class="filters">
+          <div class="filter-options">
+            <h3>Filters</h3>
+            <button id="low-pass" class="filter-btn">
+              Low Pass
+            </button>
+            <button id="high-pass" class="filter-btn">
+              High Pass
+            </button>
+        </div>
+        <div class="filter-inputs">
+          <div>
+            <label for="filter-cutoff">Cutoff</label>
+            <input type="range" id="filter-cutoff" step="1" min="1" max="100" value="1">
+          </div>
+          <div>
+            <label for="filter-color">Color</label>
+            <input type="range" id="filter-color" step=".1" min="0" max="10" value="0">
+          </div>        
+        </div>
     </div>
     <div class="container">
         <div class="sample-row">
