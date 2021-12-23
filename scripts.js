@@ -163,7 +163,7 @@ function handleFilterInput(evt) {
   const value = evt.target.value;
 
   if(evt.target.id === 'filter-resonance') {
-    const multiplier = filter.type === 'lowpass' ? 1 : 1.5;
+    const multiplier = filter.type === 'lowpass' ? .8 : 1.5;
     filter.Q.value = Math.floor(value * multiplier);
 
   } else {
@@ -173,15 +173,20 @@ function handleFilterInput(evt) {
 }
 
 function adjustedFreq(val, type) {
-  let freq = val;
+  let multiplier;
   if (type === 'highpass') {
-    freq = val * 4;
+    if (val < 100) multiplier = 4
+    if (val >= 100 && val < 200) multiplier = 5;
+    if (val >= 200 && val < 300) multiplier = 6;
+    if (val >= 300 && val < 350) multiplier = 8;
+    if (val >= 350 && val < 400) multiplier = 10;
+    if (val >= 400) multiplier = 15;
+
+    return val * multiplier;
   }
   if (type === 'lowpass') {
-    freq = 12050 - (val * 30);
+    return 12050 - (val * 30);
   }
-
-  return freq;
 }
 
 
