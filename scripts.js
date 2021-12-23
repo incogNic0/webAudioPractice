@@ -55,9 +55,9 @@ lpFilter.addEventListener('click', handleFilterClick);
 hpFilter.addEventListener('click', handleFilterClick);
 
 // FILTER INPUTS
-const filterColor = document.querySelector('#filter-color');
+const filterRes = document.querySelector('#filter-resonance');
 const filterCutoff = document.querySelector('#filter-cutoff');
-filterColor.addEventListener('input', handleFilterInput);
+filterRes.addEventListener('input', handleFilterInput);
 filterCutoff.addEventListener('input', handleFilterInput);
 
 // ========== EVENT HANDLERS ============
@@ -145,13 +145,15 @@ function handleFilterClick(evt) {
   if(btn.id === 'low-pass') {
     hpFilter.classList.remove('active');
     filter.type = 'lowpass'
+
   } else {
     lpFilter.classList.remove('active');
     filter.type = 'highpass'
   }
 
-  filter.frequency.value = adjustedCutOff(filterCutoff.value, filter.type);
-  console.log(filter.frequency.value)
+  filter.frequency.value = adjustedFreq(filterCutoff.value, filter.type);
+  filter.Q.value = filterRes.value;
+  
 
   btn.classList.toggle('active');
 }
@@ -159,35 +161,27 @@ function handleFilterClick(evt) {
 // FILTER INPUTS
 function handleFilterInput(evt) {
   const value = evt.target.value;
-  if(evt.target.id === 'filter-color') {
-    filter.Q.value = Math.floor(value * 1.3);
+
+  if(evt.target.id === 'filter-resonance') {
+    const multiplier = filter.type === 'lowpass' ? 1 : 1.5;
+    filter.Q.value = Math.floor(value * multiplier);
+
   } else {
-    const freqValue = adjustedCutOff(value, filter.type);
-    filter.frequency.value = freqValue;
+    filter.frequency.value = adjustedFreq(value, filter.type);
   }
+  
 }
 
-function adjustedCutOff(val, filter) {
-  let adjustedVal = val;
-  if (filter === 'highpass') {
-    if(val < 45 ) adjustedVal = val * 5;
-    if(val >= 45 && val < 50 ) adjustedVal = val * 7;
-    if(val >= 50 && val < 55 ) adjustedVal = val * 10;
-    if(val >= 55 && val < 60 ) adjustedVal = val * 12;
-    if(val >= 60 && val < 65 ) adjustedVal = val * 18;
-    if(val >= 65 && val < 70 ) adjustedVal = val * 25;
-    if(val >= 70 && val < 75 ) adjustedVal = val * 32;
-    if(val >= 75 && val < 80 ) adjustedVal = val * 40
-    if(val >= 80 && val < 85 ) adjustedVal = val * 50;
-    if(val >= 85 && val < 90 ) adjustedVal = val * 60;
-    if(val >= 90 && val < 95) adjustedVal = val * 70
-    if(val >= 95) adjustedVal = val * 80;
+function adjustedFreq(val, type) {
+  let freq = val;
+  if (type === 'highpass') {
+    freq = val * 4;
   }
-  if (filter === 'lowpass') {
-    adjustedVal = Math.max(Math.floor(8000 * ((100-val) / 100)), 100);
+  if (type === 'lowpass') {
+    freq = 12050 - (val * 30);
   }
 
-  return adjustedVal;
+  return freq;
 }
 
 
